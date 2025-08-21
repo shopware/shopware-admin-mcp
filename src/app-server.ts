@@ -7,7 +7,7 @@ import type {
 import { configureAppServer } from "@shopware-ag/app-server-sdk/integration/hono";
 import { Hono } from "hono";
 import { shopRepo } from "./shopware";
-import { AuthRequest, OAuthHelpers } from "@cloudflare/workers-oauth-provider";
+import type { AuthRequest, OAuthHelpers } from "@cloudflare/workers-oauth-provider";
 
 const app = new Hono<{ Bindings: Env & { OAUTH_PROVIDER: OAuthHelpers } }>();
 
@@ -124,7 +124,8 @@ app.get("/app/iframe", async (ctx) => {
 app.get("/authorize", async (c) => {
 	const oauthReqInfo = await c.env.OAUTH_PROVIDER.parseAuthRequest(c.req.raw);
 
-	return new Response(`<!DOCTYPE html>
+	return new Response(
+		`<!DOCTYPE html>
 <html>
 <head>
 	<meta charset="utf-8">
@@ -158,38 +159,40 @@ app.get("/authorize", async (c) => {
 	</div>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-</html>`, {
-		headers: {
-			"content-type": "text/html",
+</html>`,
+		{
+			headers: {
+				"content-type": "text/html",
+			},
 		},
-	})
+	);
 });
 
 app.post("/authorize", async (c) => {
-	const body = await c.req.parseBody<{ token?: string, state?: string }>();
+	const body = await c.req.parseBody<{ token?: string; state?: string }>();
 
 	if (!body.token || !body.state) {
-		return new Response('Missing token or state', { status: 400 });
+		return new Response("Missing token or state", { status: 400 });
 	}
 
 	const shopId = await c.env.OAUTH_KV.get(`auth_${body.token}`);
 	if (!shopId) {
-		return new Response('Invalid token', { status: 401 });
+		return new Response("Invalid token", { status: 401 });
 	}
 
 	const oauthHelper = c.env.OAUTH_PROVIDER as OAuthHelpers;
 
-	const { redirectTo } = await oauthHelper.completeAuthorization ({
+	const { redirectTo } = await oauthHelper.completeAuthorization({
 		props: {
 			shopId,
 		},
 		request: JSON.parse(atob(body.state)) as AuthRequest,
 		userId: shopId,
-		scope: ['write'],
+		scope: ["write"],
 		metadata: {
-			label: "Shopware"
-		}
-	})
+			label: "Shopware",
+		},
+	});
 
 	return Response.redirect(redirectTo);
 });

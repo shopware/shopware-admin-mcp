@@ -1,6 +1,6 @@
 import { ShopwareAdminMCP } from "./mcp/index";
 import OAuthProvider from "@cloudflare/workers-oauth-provider";
-import app from './app-server';
+import app from "./app-server";
 
 export { ShopwareAdminMCP } from "./mcp/index";
 

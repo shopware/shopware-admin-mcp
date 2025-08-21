@@ -23,45 +23,15 @@ A Model Context Protocol (MCP) server that provides AI assistants with direct ac
 
 - Shopware 6 instance with admin access
 - Cloudflare account with Workers enabled
-- Node.js 18+ for development
+- Node.js 24+ for development
 
 ## Installation
 
-### 1. Deploy to Cloudflare Workers
+- Download the latest release from the [releases page](https://github.com/shopware/SwagAdminMCP/releases).
+- Upload the zip to your Shopware Shop (**Shop needs to be externally accessible**)
+- Go to Extensions -> Admin MCP Configuration
+- Configure your desired Chat to use the MCP
 
-```bash
-# Clone the repository
-git clone <repository-url>
-cd shopware-mcp
-
-# Install dependencies
-npm install
-
-# Configure Wrangler
-npx wrangler login
-
-# Deploy to Cloudflare Workers
-npm run deploy
-```
-
-### 2. Install Shopware App
-
-1. Create a ZIP file from the `SwagAdminMCP` directory
-2. Upload the app to your Shopware admin panel under Extensions > My Extensions
-3. Install and activate the app
-4. Configure the app with your deployed Worker URL
-
-### 3. Configure Environment Variables
-
-Set the following environment variables in your Cloudflare Worker:
-
-```bash
-wrangler secret put APP_SECRET
-wrangler secret put APP_URL
-```
-
-- `APP_SECRET`: Secret key for Shopware app authentication
-- `APP_URL`: Your deployed Worker URL (e.g., `https://your-worker.workers.dev`)
 
 ## Usage
 
@@ -75,7 +45,7 @@ Add the following configuration to your Claude Desktop config file:
     "shopware": {
       "transport": {
         "type": "http",
-        "url": "https://your-worker.workers.dev/sse"
+        "url": "https://shopware-admin-mcp.shopware-db5.workers.dev/sse"
       }
     }
   }
@@ -85,7 +55,7 @@ Add the following configuration to your Claude Desktop config file:
 ### With Other MCP Clients
 
 Use the HTTP transport with:
-- **URL**: `https://your-worker.workers.dev/sse`
+- **URL**: `https://shopware-admin-mcp.shopware-db5.workers.dev/sse`
 - **Authentication**: OAuth flow via `/authorize` endpoint
 
 ## Development
@@ -178,11 +148,3 @@ MIT License - see LICENSE file for details.
 ## Support
 
 For issues and feature requests, please use the GitHub issue tracker.
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes following the existing code style
-4. Run tests and linting
-5. Submit a pull request

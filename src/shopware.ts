@@ -7,24 +7,24 @@ export const shopRepo = new CloudflareShopRepository(env.shopStorage);
 const clients = new Map<string, HttpClient>();
 
 export async function getClient(shopId: string): Promise<HttpClient> {
-    if (clients.has(shopId)) {
-        return clients.get(shopId)!;
-    }
+	if (clients.has(shopId)) {
+		return clients.get(shopId)!;
+	}
 
-    const shop = await shopRepo.getShopById(shopId);
+	const shop = await shopRepo.getShopById(shopId);
 
-    if (!shop) {
-        throw new Error(`Shop with id ${shopId} not found`);
-    }
+	if (!shop) {
+		throw new Error(`Shop with id ${shopId} not found`);
+	}
 
-    const client = new HttpClient(shop);
-    clients.set(shopId, client);
-    return client;
+	const client = new HttpClient(shop);
+	clients.set(shopId, client);
+	return client;
 }
 
 export type Price = {
-    currencyId: string;
-    net: number;
-    gross: number;
-    linked: boolean;
+	currencyId: string;
+	net: number;
+	gross: number;
+	linked: boolean;
 };

@@ -10,7 +10,11 @@ import { McpAgent } from "agents/mcp";
 import { z } from "zod";
 import { getClient, type Price } from "../shopware";
 
-export class ShopwareAdminMCP extends McpAgent<unknown, unknown, { shopId: string }> {
+export class ShopwareAdminMCP extends McpAgent<
+	unknown,
+	unknown,
+	{ shopId: string }
+> {
 	server = new McpServer({
 		name: "Shopware Admin",
 		version: "1.0.0",
@@ -24,7 +28,7 @@ export class ShopwareAdminMCP extends McpAgent<unknown, unknown, { shopId: strin
 				term: z.string().optional().describe("Search term"),
 			},
 			async (data) => {
-				const client = await getClient(this.props.shopId)
+				const client = await getClient(this.props.shopId);
 
 				const productRepository = new EntityRepository<{
 					productNumber: string;
@@ -102,7 +106,7 @@ export class ShopwareAdminMCP extends McpAgent<unknown, unknown, { shopId: strin
 				grossPrice: z.number().min(0),
 			},
 			async (data) => {
-				const client = await getClient(this.props.shopId)
+				const client = await getClient(this.props.shopId);
 
 				const productRepository = new EntityRepository<{
 					name: string;
@@ -179,7 +183,7 @@ export class ShopwareAdminMCP extends McpAgent<unknown, unknown, { shopId: strin
 				description: z.string().optional(),
 			},
 			async (data) => {
-				const client = await getClient(this.props.shopId)
+				const client = await getClient(this.props.shopId);
 
 				const productRepository = new EntityRepository<{
 					name?: string;
