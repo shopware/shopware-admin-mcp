@@ -1,5 +1,4 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import type { SimpleShop } from "@shopware-ag/app-server-sdk";
 import {
 	ApiContext,
 	Defaults,
@@ -9,11 +8,11 @@ import {
 import { Criteria } from "@shopware-ag/app-server-sdk/helper/criteria";
 import { McpAgent } from "agents/mcp";
 import { z } from "zod";
-import { getClient, shopRepo, type Price } from "../shopware";
+import { getClient, type Price } from "../shopware";
 
 export class ShopwareAdminMCP extends McpAgent<unknown, unknown, { shopId: string }> {
 	server = new McpServer({
-		name: "Shopware",
+		name: "Shopware Admin",
 		version: "1.0.0",
 	});
 

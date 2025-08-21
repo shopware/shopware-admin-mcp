@@ -9,7 +9,7 @@
         <description lang="de-DE">Ermöglicht die Durchführung von Administrationsaufgaben mit dem Model Context Protocol</description>
         <author>shopware AG</author>
         <copyright>(c) by shopware AG</copyright>
-        <version>1.0.0</version>
+        <version>0.0.1</version>
         <icon>icon.png</icon>
         <license>MIT</license>
     </meta>
