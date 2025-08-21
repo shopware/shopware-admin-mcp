@@ -175,3 +175,4 @@ dist
 !.dev.vars.example
 .env*
 !.env.example
+SwagAdminMCP.zip
