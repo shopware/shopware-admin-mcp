@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/platform/trunk/src/Core/Framework/App/Manifest/Schema/manifest-2.0.xsd">
+    <meta>
+        <name>SwagAdminMCP</name>
+        <label>Shopware Admin MCP</label>
+        <label lang="de-DE">Shopware Admin MCP</label>
+        <description>Allows to do administrative tasks using the Model Context Protocol</description>
+        <description lang="de-DE">Ermöglicht die Durchführung von Administrationsaufgaben mit dem Model Context Protocol</description>
+        <author>shopware AG</author>
+        <copyright>(c) by shopware AG</copyright>
+        <version>1.0.0</version>
+        <icon>icon.png</icon>
+        <license>MIT</license>
+    </meta>
+    <webhooks>
+        <webhook name="appActivate" url="https://shopware-admin-mcp.shopware-db5.workers.dev/app/activate" event="app.activated"/>
+        <webhook name="appDeactivated" url="https://shopware-admin-mcp.shopware-db5.workers.dev/app/deactivate" event="app.deactivated"/>
+        <webhook name="appDelete" url="https://shopware-admin-mcp.shopware-db5.workers.dev/app/delete" event="app.deleted"/>
+    </webhooks>
+    <setup>
+        <registrationUrl>https://shopware-admin-mcp.shopware-db5.workers.dev/app/register</registrationUrl>
+        <secret>LDGSZBmaH1KPEzVU5kjttzV2PpVZx7vO</secret>
+    </setup>
+    <permissions>
+        <read>product</read>
+        <create>product</create>
+        <delete>product</delete>
+        <update>product</update>
+
+        <read>product_translation</read>
+        <create>product_translation</create>
+        <delete>product_translation</delete>
+        <update>product_translation</update>
+
+        <read>sales_channel</read>
+        <create>sales_channel</create>
+        <delete>sales_channel</delete>
+        <update>sales_channel</update>
+
+        <read>tax</read>
+        <create>tax</create>
+        <delete>tax</delete>
+        <update>tax</update>
+    </permissions>
+    <admin>
+        <module name="mcpConfig" parent="sw-extension" source="https://shopware-admin-mcp.shopware-db5.workers.dev/app/iframe">
+            <label>Admin MCP Configuration</label>
+        </module>
+    </admin>
+</manifest>
