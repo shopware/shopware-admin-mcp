@@ -1,5 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { McpAgent } from "agents/mcp";
+import { categoryList } from "./tools/category";
 import {
 	productCreate,
 	productGet,
@@ -7,7 +8,6 @@ import {
 	productUpdate,
 } from "./tools/product";
 import { salesChannelList } from "./tools/sales_channel";
-import { categoryList } from "./tools/category";
 
 export class ShopwareAdminMCP extends McpAgent<
 	unknown,

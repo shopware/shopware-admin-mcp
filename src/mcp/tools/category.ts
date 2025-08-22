@@ -1,13 +1,20 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { getClient, serializeLLM } from "../../shopware";
-import { ApiContext, EntityRepository } from "@shopware-ag/app-server-sdk/helper/admin-api";
+import {
+	ApiContext,
+	EntityRepository,
+} from "@shopware-ag/app-server-sdk/helper/admin-api";
 import { Criteria } from "@shopware-ag/app-server-sdk/helper/criteria";
+import { getClient, serializeLLM } from "../../shopware";
 
 export function categoryList(server: McpServer, shopId: string) {
 	server.tool("category_list", {}, async () => {
 		const client = await getClient(shopId);
 
-		const categoryRepository = new EntityRepository<{ id: string; translated: { name: string; }; parentId: string | null; }>(client, "category");
+		const categoryRepository = new EntityRepository<{
+			id: string;
+			translated: { name: string };
+			parentId: string | null;
+		}>(client, "category");
 
 		const criteria = new Criteria();
 		criteria.addFields("id", "name", "parentId");
@@ -18,8 +25,8 @@ export function categoryList(server: McpServer, shopId: string) {
 			new ApiContext(null, true),
 		);
 
-        for (const category of categories.data) {
-            //@ts-expect-error
+		for (const category of categories.data) {
+			//@ts-expect-error
 			delete category.translated;
 		}
 

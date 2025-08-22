@@ -24,9 +24,8 @@ export function salesChannelList(server: McpServer, shopId: string) {
 
 		const salesChannels = await salesChannelRepository.search(criteria);
 
-
-        for (const channel of salesChannels.data) {
-            //@ts-expect-error
+		for (const channel of salesChannels.data) {
+			//@ts-expect-error
 			delete channel.translated;
 		}
 
