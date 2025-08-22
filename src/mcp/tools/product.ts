@@ -35,6 +35,7 @@ type ProductCreate = {
 	price: Price[];
 	stock: number;
 	visibilities: ProductVisibility[];
+	categories: { id: string }[];
 };
 
 export const productList = (server: McpServer, shopId: string) => {
@@ -132,6 +133,10 @@ export const productCreate = (server: McpServer, shopId: string) => {
 				.array(z.string())
 				.optional()
 				.describe("Sales channel ids in which the product should be visible"),
+			categories: z
+				.array(z.string())
+				.optional()
+				.describe("Category ids to which the product belongs"),
 		},
 		async (data) => {
 			const client = await getClient(shopId);
@@ -168,6 +173,10 @@ export const productCreate = (server: McpServer, shopId: string) => {
 								data.visibilities?.map((salesChannelId) => ({
 									salesChannelId,
 									visibility: 30, // Default visibility
+								})) || [],
+							categories:
+								data.categories?.map((categoryId) => ({
+									id: categoryId,
 								})) || [],
 						},
 					],
@@ -211,6 +220,12 @@ export const productUpdate = (server: McpServer, shopId: string) => {
 				.describe(
 					"Sales channel ids in which the product should be visible (replaces existing visibilities)",
 				),
+			categories: z
+				.array(z.string())
+				.optional()
+				.describe(
+					"Category ids to which the product belongs (replaces existing categories)",
+				),
 		},
 		async (data) => {
 			const client = await getClient(shopId);
@@ -243,6 +258,11 @@ export const productUpdate = (server: McpServer, shopId: string) => {
 							visibilities: data.visibilities.map((salesChannelId) => ({
 								salesChannelId: salesChannelId,
 								visibility: 30,
+							})),
+						}),
+						...(data.categories && {
+							categories: data.categories.map((categoryId) => ({
+								id: categoryId,
 							})),
 						}),
 					},

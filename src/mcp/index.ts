@@ -1,6 +1,11 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { McpAgent } from "agents/mcp";
-import { categoryList } from "./tools/category";
+import {
+	categoryCreate,
+	categoryDelete,
+	categoryList,
+	categoryUpdate,
+} from "./tools/category";
 import {
 	productCreate,
 	productGet,
@@ -22,8 +27,13 @@ export class ShopwareAdminMCP extends McpAgent<
 	async init() {
 		salesChannelList(this.server, this.props.shopId);
 
+		// Category tools
 		categoryList(this.server, this.props.shopId);
+		categoryCreate(this.server, this.props.shopId);
+		categoryUpdate(this.server, this.props.shopId);
+		categoryDelete(this.server, this.props.shopId);
 
+		// Product tools
 		productList(this.server, this.props.shopId);
 		productGet(this.server, this.props.shopId);
 		productCreate(this.server, this.props.shopId);
