@@ -12,12 +12,13 @@ export function categoryList(server: McpServer, shopId: string) {
 
 		const categoryRepository = new EntityRepository<{
 			id: string;
+			active: boolean;
 			translated: { name: string };
 			parentId: string | null;
 		}>(client, "category");
 
 		const criteria = new Criteria();
-		criteria.addFields("id", "name", "parentId");
+		criteria.addFields("id", "name", "parentId", "active");
 		criteria.setLimit(50);
 
 		const categories = await categoryRepository.search(
