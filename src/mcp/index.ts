@@ -6,7 +6,8 @@ import {
 	productList,
 	productUpdate,
 } from "./tools/product";
-import { salesChannelResource } from "./tools/sales_channel";
+import { salesChannelList } from "./tools/sales_channel";
+import { categoryList } from "./tools/category";
 
 export class ShopwareAdminMCP extends McpAgent<
 	unknown,
@@ -19,7 +20,9 @@ export class ShopwareAdminMCP extends McpAgent<
 	});
 
 	async init() {
-		salesChannelResource(this.server, this.props.shopId);
+		salesChannelList(this.server, this.props.shopId);
+
+		categoryList(this.server, this.props.shopId);
 
 		productList(this.server, this.props.shopId);
 		productGet(this.server, this.props.shopId);
