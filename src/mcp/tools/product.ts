@@ -123,6 +123,7 @@ export const productCreate = (server: McpServer, shopId: string) => {
 		"product_create",
 		{
 			name: z.string(),
+			active: z.boolean().default(false),
 			productNumber: z.string(),
 			description: z.string(),
 			taxRate: z.number().default(19),
@@ -157,7 +158,7 @@ export const productCreate = (server: McpServer, shopId: string) => {
 							id,
 							productNumber: data.productNumber,
 							name: data.name,
-							active: false,
+							active: data.active,
 							description: data.description,
 							taxId,
 							stock: data.stock,
@@ -197,7 +198,7 @@ export const productCreate = (server: McpServer, shopId: string) => {
 				content: [
 					{
 						type: "text",
-						text: `Product created with id: ${id}. Product is not yet active`,
+						text: `Product created with id: ${id}.`,
 					},
 				],
 			};
