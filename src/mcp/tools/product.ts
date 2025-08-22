@@ -4,6 +4,8 @@ import {
 	Defaults,
 	// Defaults,
 	EntityRepository,
+	SyncOperation,
+	SyncService,
 	uuid,
 } from "@shopware-ag/app-server-sdk/helper/admin-api";
 import { Criteria } from "@shopware-ag/app-server-sdk/helper/criteria";
@@ -18,6 +20,11 @@ type Price = {
 	linked: boolean;
 };
 
+type ProductVisibility = {
+	salesChannelId: string;
+	visibility: number;
+};
+
 type ProductCreate = {
 	id: string;
 	active: boolean;
@@ -27,11 +34,8 @@ type ProductCreate = {
 	productNumber: string;
 	price: Price[];
 	stock: number;
-	visibilities: {
-		salesChannelId: string;
-		visibility: number;
-	}[];
-}
+	visibilities: ProductVisibility[];
+};
 
 export const productList = (server: McpServer, shopId: string) => {
 	server.tool(
@@ -132,34 +136,43 @@ export const productCreate = (server: McpServer, shopId: string) => {
 		async (data) => {
 			const client = await getClient(shopId);
 
-			const productRepository = new EntityRepository<ProductCreate>(client, "product");
+			const productRepository = new EntityRepository<ProductCreate>(
+				client,
+				"product",
+			);
 
 			const taxId = await getOrCreateTaxByRate(client, data.taxRate);
 
 			const id = uuid();
 
 			try {
-				await productRepository.upsert([{
-				id,
-				productNumber: data.productNumber,
-				name: data.name,
-				active: false,
-				description: data.description,
-				taxId,
-				stock: data.stock,
-				price: [
-					{
-						currencyId: Defaults.systemCurrencyId,
-						net: data.netPrice,
-						gross: data.grossPrice,
-						linked: false,
-					},
-				],
-				visibilities: data.visibilities?.map((salesChannelId) => ({
-					salesChannelId,
-					visibility: 30, // Default visibility
-				})) || [],
-			}], new ApiContext(null, true));
+				await productRepository.upsert(
+					[
+						{
+							id,
+							productNumber: data.productNumber,
+							name: data.name,
+							active: false,
+							description: data.description,
+							taxId,
+							stock: data.stock,
+							price: [
+								{
+									currencyId: Defaults.systemCurrencyId,
+									net: data.netPrice,
+									gross: data.grossPrice,
+									linked: false,
+								},
+							],
+							visibilities:
+								data.visibilities?.map((salesChannelId) => ({
+									salesChannelId,
+									visibility: 30, // Default visibility
+								})) || [],
+						},
+					],
+					new ApiContext(null, true),
+				);
 			} catch (e) {
 				return {
 					content: [
@@ -191,24 +204,52 @@ export const productUpdate = (server: McpServer, shopId: string) => {
 			active: z.boolean().optional(),
 			name: z.string().optional(),
 			description: z.string().optional(),
+			stock: z.number().optional(),
+			visibilities: z
+				.array(z.string())
+				.optional()
+				.describe(
+					"Sales channel ids in which the product should be visible (replaces existing visibilities)",
+				),
 		},
 		async (data) => {
 			const client = await getClient(shopId);
 
-			const productRepository = new EntityRepository<{
-				name?: string;
-				description?: string;
-				active?: boolean;
-			}>(client, "product");
+			const syncService = new SyncService(client);
 
-			const payload = {
-				id: data.id,
-				...(data.active !== undefined && { active: data.active }),
-				...(data.name && { name: data.name }),
-				...(data.description && { description: data.description }),
-			};
+			const ops: SyncOperation[] = [];
 
-			await productRepository.upsert([payload], new ApiContext(null, true));
+			if (data.visibilities) {
+				ops.push(
+					new SyncOperation(
+						"visibility-delete",
+						"product_visibility",
+						"delete",
+						[],
+						[Criteria.equals("productId", data.id)],
+					),
+				);
+			}
+
+			ops.push(
+				new SyncOperation("product-update", "product", "upsert", [
+					{
+						id: data.id,
+						...(data.active !== undefined && { active: data.active }),
+						...(data.name && { name: data.name }),
+						...(data.description && { description: data.description }),
+						...(data.stock !== undefined && { stock: data.stock }),
+						...(data.visibilities && {
+							visibilities: data.visibilities.map((salesChannelId) => ({
+								salesChannelId: salesChannelId,
+								visibility: 30,
+							})),
+						}),
+					},
+				]),
+			);
+
+			await syncService.sync(ops);
 
 			return {
 				content: [
