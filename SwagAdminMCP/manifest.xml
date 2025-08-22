@@ -9,7 +9,7 @@
         <description lang="de-DE">Ermöglicht die Durchführung von Administrationsaufgaben mit dem Model Context Protocol</description>
         <author>shopware AG</author>
         <copyright>(c) by shopware AG</copyright>
-        <version>0.0.1</version>
+        <version>0.0.2</version>
         <icon>icon.png</icon>
         <license>MIT</license>
     </meta>
@@ -23,6 +23,7 @@
         <secret>LDGSZBmaH1KPEzVU5kjttzV2PpVZx7vO</secret>
     </setup>
     <permissions>
+        <!-- Product-->
         <read>product</read>
         <create>product</create>
         <delete>product</delete>
@@ -33,11 +34,35 @@
         <delete>product_translation</delete>
         <update>product_translation</update>
 
+        <read>product_visibility</read>
+        <create>product_visibility</create>
+        <delete>product_visibility</delete>
+        <update>product_visibility</update>
+
+        <!-- Category -->
+        <read>category</read>
+        <create>category</create>
+        <delete>category</delete>
+        <update>category</update>
+
+        <read>category_translation</read>
+        <create>category_translation</create>
+        <delete>category_translation</delete>
+        <update>category_translation</update>
+        
+        <!-- Sales Channel -->
         <read>sales_channel</read>
         <create>sales_channel</create>
         <delete>sales_channel</delete>
         <update>sales_channel</update>
 
+        <!-- Media -->
+        <read>media</read>
+        <create>media</create>
+        <delete>media</delete>
+        <update>media</update>
+
+        <!-- Tax -->
         <read>tax</read>
         <create>tax</create>
         <delete>tax</delete>

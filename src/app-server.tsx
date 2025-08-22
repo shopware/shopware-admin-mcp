@@ -1,12 +1,13 @@
+/** biome-ignore-all lint/security/noDangerouslySetInnerHtml: need to send post msg */
 import { env } from "cloudflare:workers";
-import { configureAppServer } from "@shopware-ag/app-server-sdk/integration/hono";
-import { Hono } from "hono";
-import type { FC } from "hono/jsx";
-import { appServer } from "./shopware";
 import type {
 	AuthRequest,
 	OAuthHelpers,
 } from "@cloudflare/workers-oauth-provider";
+import { configureAppServer } from "@shopware-ag/app-server-sdk/integration/hono";
+import { Hono } from "hono";
+import type { FC } from "hono/jsx";
+import { appServer } from "./shopware";
 
 const app = new Hono<{ Bindings: Env & { OAUTH_PROVIDER: OAuthHelpers } }>();
 
@@ -17,7 +18,7 @@ configureAppServer(app, {
 
 const Layout: FC<{ title: string; children: any }> = ({ title, children }) => {
 	return (
-		<html>
+		<html lang="en-US">
 			<head>
 				<meta charset="utf-8" />
 				<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -53,9 +54,12 @@ const ConfigurationPage: FC<{ appUrl: string; authHeader: string }> = ({
 							</div>
 							<div class="card-body">
 								<div class="mb-3">
-									<label class="form-label fw-bold">MCP Server URL:</label>
+									<label class="form-label fw-bold" for="mcpSSE">
+										MCP Server URL:
+									</label>
 									<div class="input-group">
 										<input
+											id="mcpSSE"
 											type="text"
 											class="form-control"
 											value={`${appUrl}/sse`}
@@ -64,9 +68,12 @@ const ConfigurationPage: FC<{ appUrl: string; authHeader: string }> = ({
 									</div>
 								</div>
 								<div class="mb-3">
-									<label class="form-label fw-bold">Authorization Token:</label>
+									<label class="form-label fw-bold" for="mcpSecret">
+										Authorization Token:
+									</label>
 									<div class="input-group">
 										<input
+											id="mcpSecret"
 											type="text"
 											class="form-control"
 											value={authHeader}

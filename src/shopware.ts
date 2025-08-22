@@ -1,15 +1,15 @@
 import { env } from "cloudflare:workers";
 import {
+	type AppActivateEvent,
+	type AppDeactivateEvent,
+	AppServer,
+	HttpClient,
+	type ShopInterface,
+} from "@shopware-ag/app-server-sdk";
+import {
 	CloudflareHttpClientTokenCache,
 	CloudflareShopRepository,
 } from "@shopware-ag/app-server-sdk/integration/cloudflare-kv";
-import {
-	AppActivateEvent,
-	AppDeactivateEvent,
-	AppServer,
-	HttpClient,
-	ShopInterface,
-} from "@shopware-ag/app-server-sdk";
 
 export const shopRepo = new CloudflareShopRepository(env.shopStorage);
 export const tokenCache = new CloudflareHttpClientTokenCache(env.OAUTH_KV);
@@ -69,9 +69,21 @@ export async function getClient(shopId: string): Promise<HttpClient> {
 	return client;
 }
 
-export type Price = {
-	currencyId: string;
-	net: number;
-	gross: number;
-	linked: boolean;
-};
+export function serializeLLM(result: { data: any[] } | any): string {
+	if ("data" in result) {
+		for (const item of result.data) {
+			reduceEntity(item);
+		}
+
+		return JSON.stringify(result);
+	} else {
+		return JSON.stringify(reduceEntity(result));
+	}
+}
+
+function reduceEntity(entity: any) {
+	delete entity.extensions;
+	delete entity._uniqueIdentifier;
+	delete entity.apiAlias;
+	return entity;
+}
