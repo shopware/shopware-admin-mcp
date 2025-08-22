@@ -1,50 +1,14 @@
 import { env } from "cloudflare:workers";
-import type {
-	AppActivateEvent,
-	AppDeactivateEvent,
-	ShopInterface,
-} from "@shopware-ag/app-server-sdk";
 import { configureAppServer } from "@shopware-ag/app-server-sdk/integration/hono";
 import { Hono } from "hono";
-import { shopRepo } from "./shopware";
+import { appServer } from "./shopware";
 import type { AuthRequest, OAuthHelpers } from "@cloudflare/workers-oauth-provider";
 
 const app = new Hono<{ Bindings: Env & { OAUTH_PROVIDER: OAuthHelpers } }>();
 
 // @ts-expect-error
 configureAppServer(app, {
-	appName: "SwagAdminMCP",
-	appSecret: env.APP_SECRET,
-	shopRepository: shopRepo,
-	appUrl: env.APP_URL,
-	setup: (app) => {
-		app.hooks.on(
-			"onAppActivate",
-			async (event: AppActivateEvent<ShopInterface>) => {
-				const shopId = event.shop.getShopId();
-				const authHeader = btoa(crypto.randomUUID());
-				await Promise.all([
-					env.OAUTH_KV.put(`auth_${authHeader}`, shopId),
-					env.OAUTH_KV.put(`reverse_${shopId}`, authHeader),
-				]);
-			},
-		);
-
-		app.hooks.on(
-			"onAppDeactivate",
-			async (event: AppDeactivateEvent<ShopInterface>) => {
-				const shopId = event.shop.getShopId();
-				const authHeader = await env.OAUTH_KV.get(`reverse_${shopId}`);
-
-				if (authHeader) {
-					await Promise.all([
-						env.OAUTH_KV.delete(`auth_${authHeader}`),
-						env.OAUTH_KV.delete(`reverse_${shopId}`),
-					]);
-				}
-			},
-		);
-	},
+	appServer
 });
 
 app.get("/app/iframe", async (ctx) => {
