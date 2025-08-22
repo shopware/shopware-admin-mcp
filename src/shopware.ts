@@ -1,15 +1,28 @@
 import { env } from "cloudflare:workers";
-import { CloudflareHttpClientTokenCache, CloudflareShopRepository } from "@shopware-ag/app-server-sdk/integration/cloudflare-kv";
-import { AppActivateEvent, AppDeactivateEvent, AppServer, HttpClient, ShopInterface } from "@shopware-ag/app-server-sdk";
+import {
+	CloudflareHttpClientTokenCache,
+	CloudflareShopRepository,
+} from "@shopware-ag/app-server-sdk/integration/cloudflare-kv";
+import {
+	AppActivateEvent,
+	AppDeactivateEvent,
+	AppServer,
+	HttpClient,
+	ShopInterface,
+} from "@shopware-ag/app-server-sdk";
 
 export const shopRepo = new CloudflareShopRepository(env.shopStorage);
 export const tokenCache = new CloudflareHttpClientTokenCache(env.OAUTH_KV);
 
-export const appServer = new AppServer({
-	appName: 'SwagAdminMCP',
-	appSecret: env.APP_SECRET,
-	authorizeCallbackUrl: `${env.APP_URL}/app/register/confirm`
-}, shopRepo, tokenCache);
+export const appServer = new AppServer(
+	{
+		appName: "SwagAdminMCP",
+		appSecret: env.APP_SECRET,
+		authorizeCallbackUrl: `${env.APP_URL}/app/register/confirm`,
+	},
+	shopRepo,
+	tokenCache,
+);
 
 appServer.hooks.on(
 	"onAppActivate",
