@@ -9,7 +9,7 @@
         <description lang="de-DE">Ermöglicht die Durchführung von Administrationsaufgaben mit dem Model Context Protocol</description>
         <author>shopware AG</author>
         <copyright>(c) by shopware AG</copyright>
-        <version>0.0.3</version>
+        <version>0.0.4</version>
         <icon>icon.png</icon>
         <license>MIT</license>
     </meta>
@@ -43,6 +43,11 @@
         <create>product_category</create>
         <delete>product_category</delete>
         <update>product_category</update>
+
+        <read>product_media</read>
+        <create>product_media</create>
+        <delete>product_media</delete>
+        <update>product_media</update>
 
         <!-- Category -->
         <read>category</read>
