@@ -16,6 +16,7 @@ configureAppServer(app, {
 	appServer,
 });
 
+// biome-ignore lint/suspicious/noExplicitAny: we want to reduce any entity
 const Layout: FC<{ title: string; children: any }> = ({ title, children }) => {
 	return (
 		<html lang="en-US">

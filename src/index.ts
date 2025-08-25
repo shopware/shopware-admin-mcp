@@ -11,6 +11,7 @@ export default new OAuthProvider({
 	},
 	authorizeEndpoint: "/authorize",
 	clientRegistrationEndpoint: "/register",
+	// biome-ignore lint/suspicious/noExplicitAny: typing bug in lib
 	defaultHandler: app as any,
 	tokenEndpoint: "/token",
 });

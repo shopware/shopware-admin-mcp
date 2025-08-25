@@ -48,15 +48,21 @@ export function categoryCreate(server: McpServer, shopId: string) {
 	server.tool(
 		"category_create",
 		{
-			name: z.string().describe("Category name"),
-			parentId: z
-				.string()
-				.optional()
-				.describe("Parent category ID (optional for root category)"),
-			active: z
-				.boolean()
-				.default(true)
-				.describe("Whether the category should be active"),
+			categories: z
+				.array(
+					z.object({
+						name: z.string().describe("Category name"),
+						parentId: z
+							.string()
+							.optional()
+							.describe("Parent category ID (optional for root category)"),
+						active: z
+							.boolean()
+							.default(true)
+							.describe("Whether the category should be active"),
+					}),
+				)
+				.describe("Array of categories to create"),
 		},
 		async (data) => {
 			const client = await getClient(shopId);
@@ -68,23 +74,23 @@ export function categoryCreate(server: McpServer, shopId: string) {
 				active: boolean;
 			}>(client, "category");
 
-			const id = uuid();
-
-			const payload = {
-				id,
-				name: data.name,
-				active: data.active,
-				...(data.parentId && { parentId: data.parentId }),
-			};
+			const payloads = data.categories.map((category) => ({
+				id: uuid(),
+				name: category.name,
+				active: category.active,
+				...(category.parentId && { parentId: category.parentId }),
+			}));
 
 			try {
-				await categoryRepository.upsert([payload], new ApiContext(null, true));
+				await categoryRepository.upsert(payloads, new ApiContext(null, true));
 
 				return {
 					content: [
 						{
 							type: "text",
-							text: `Category created successfully with ID: ${id}`,
+							text: serializeLLM(
+								payloads.map((p) => ({ id: p.id, name: p.name })),
+							),
 						},
 					],
 				};
@@ -93,7 +99,7 @@ export function categoryCreate(server: McpServer, shopId: string) {
 					content: [
 						{
 							type: "text",
-							text: `Error creating category: ${serializeLLM(e)}`,
+							text: `Error creating categories: ${serializeLLM(e)}`,
 						},
 					],
 				};
@@ -106,13 +112,19 @@ export function categoryUpdate(server: McpServer, shopId: string) {
 	server.tool(
 		"category_update",
 		{
-			id: z.string().describe("Category ID to update"),
-			name: z.string().optional().describe("New category name"),
-			parentId: z.string().optional().describe("New parent category ID"),
-			active: z
-				.boolean()
-				.optional()
-				.describe("Whether the category should be active"),
+			categories: z
+				.array(
+					z.object({
+						id: z.string().describe("Category ID to update"),
+						name: z.string().optional().describe("New category name"),
+						parentId: z.string().optional().describe("New parent category ID"),
+						active: z
+							.boolean()
+							.optional()
+							.describe("Whether the category should be active"),
+					}),
+				)
+				.describe("Array of categories to update"),
 		},
 		async (data) => {
 			const client = await getClient(shopId);
@@ -124,21 +136,21 @@ export function categoryUpdate(server: McpServer, shopId: string) {
 				active?: boolean;
 			}>(client, "category");
 
-			const payload = {
-				id: data.id,
-				...(data.name && { name: data.name }),
-				...(data.parentId !== undefined && { parentId: data.parentId }),
-				...(data.active !== undefined && { active: data.active }),
-			};
+			const payloads = data.categories.map((category) => ({
+				id: category.id,
+				...(category.name && { name: category.name }),
+				...(category.parentId !== undefined && { parentId: category.parentId }),
+				...(category.active !== undefined && { active: category.active }),
+			}));
 
 			try {
-				await categoryRepository.upsert([payload], new ApiContext(null, true));
+				await categoryRepository.upsert(payloads, new ApiContext(null, true));
 
 				return {
 					content: [
 						{
 							type: "text",
-							text: "Category updated successfully",
+							text: "Updated all categories successfully",
 						},
 					],
 				};
@@ -147,7 +159,7 @@ export function categoryUpdate(server: McpServer, shopId: string) {
 					content: [
 						{
 							type: "text",
-							text: `Error updating category: ${serializeLLM(e)}`,
+							text: `Error updating categories: ${serializeLLM(e)}`,
 						},
 					],
 				};
@@ -160,7 +172,7 @@ export function categoryDelete(server: McpServer, shopId: string) {
 	server.tool(
 		"category_delete",
 		{
-			id: z.string().describe("Category ID to delete"),
+			ids: z.array(z.string()).describe("Array of category IDs to delete"),
 		},
 		async (data) => {
 			const client = await getClient(shopId);
@@ -171,7 +183,7 @@ export function categoryDelete(server: McpServer, shopId: string) {
 
 			try {
 				await categoryRepository.delete(
-					[{ id: data.id }],
+					data.ids.map((id) => ({ id })),
 					new ApiContext(null, true),
 				);
 
@@ -179,7 +191,11 @@ export function categoryDelete(server: McpServer, shopId: string) {
 					content: [
 						{
 							type: "text",
-							text: "Category deleted successfully",
+							text: serializeLLM({
+								success: true,
+								count: data.ids.length,
+								deletedIds: data.ids,
+							}),
 						},
 					],
 				};
@@ -188,7 +204,7 @@ export function categoryDelete(server: McpServer, shopId: string) {
 					content: [
 						{
 							type: "text",
-							text: `Error deleting category: ${serializeLLM(e)}`,
+							text: `Error deleting categories: ${serializeLLM(e)}`,
 						},
 					],
 				};

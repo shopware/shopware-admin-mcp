@@ -54,8 +54,10 @@ appServer.hooks.on(
 const clients = new Map<string, HttpClient>();
 
 export async function getClient(shopId: string): Promise<HttpClient> {
-	if (clients.has(shopId)) {
-		return clients.get(shopId)!;
+	const client = clients.get(shopId);
+
+	if (client) {
+		return client;
 	}
 
 	const shop = await shopRepo.getShopById(shopId);
@@ -64,11 +66,12 @@ export async function getClient(shopId: string): Promise<HttpClient> {
 		throw new Error(`Shop with id ${shopId} not found`);
 	}
 
-	const client = new HttpClient(shop, tokenCache);
-	clients.set(shopId, client);
-	return client;
+	const newClient = new HttpClient(shop, tokenCache);
+	clients.set(shopId, newClient);
+	return newClient;
 }
 
+// biome-ignore lint/suspicious/noExplicitAny: we want to reduce any entity
 export function serializeLLM(result: { data: any[] } | any): string {
 	if ("data" in result) {
 		for (const item of result.data) {
@@ -81,6 +84,7 @@ export function serializeLLM(result: { data: any[] } | any): string {
 	}
 }
 
+// biome-ignore lint/suspicious/noExplicitAny: we want to reduce any entity
 function reduceEntity(entity: any) {
 	delete entity.extensions;
 	delete entity._uniqueIdentifier;
