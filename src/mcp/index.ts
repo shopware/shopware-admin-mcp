@@ -6,6 +6,7 @@ import {
 	categoryList,
 	categoryUpdate,
 } from "./tools/category";
+import { uploadMediaByUrl } from "./tools/media";
 import {
 	productCreate,
 	productGet,
@@ -13,7 +14,6 @@ import {
 	productUpdate,
 } from "./tools/product";
 import { salesChannelList } from "./tools/sales_channel";
-import { uploadMediaByUrl } from "./tools/media";
 
 export class ShopwareAdminMCP extends McpAgent<
 	unknown,

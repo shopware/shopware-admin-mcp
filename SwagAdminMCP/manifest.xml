@@ -9,7 +9,7 @@
         <description lang="de-DE">Ermöglicht die Durchführung von Administrationsaufgaben mit dem Model Context Protocol</description>
         <author>shopware AG</author>
         <copyright>(c) by shopware AG</copyright>
-        <version>0.0.5</version>
+        <version>0.0.6</version>
         <icon>icon.png</icon>
         <license>MIT</license>
     </meta>
@@ -87,6 +87,27 @@
         <create>tax</create>
         <delete>tax</delete>
         <update>tax</update>
+
+        <!-- Theme -->
+        <read>theme</read>
+        <create>theme</create>
+        <delete>theme</delete>
+        <update>theme</update>
+
+        <read>theme_translation</read>
+        <create>theme_translation</create>
+        <delete>theme_translation</delete>
+        <update>theme_translation</update>
+
+        <read>theme_media</read>
+        <create>theme_media</create>
+        <delete>theme_media</delete>
+        <update>theme_media</update>
+
+        <read>theme_sales_channel</read>
+        <create>theme_sales_channel</create>
+        <delete>theme_sales_channel</delete>
+        <update>theme_sales_channel</update>
     </permissions>
     <admin>
         <module name="mcpConfig" parent="sw-extension" source="https://shopware-admin-mcp.shopware-db5.workers.dev/app/iframe">
