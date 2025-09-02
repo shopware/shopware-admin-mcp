@@ -9,7 +9,7 @@
         <description lang="de-DE">Ermöglicht die Durchführung von Administrationsaufgaben mit dem Model Context Protocol</description>
         <author>shopware AG</author>
         <copyright>(c) by shopware AG</copyright>
-        <version>0.0.4</version>
+        <version>0.0.5</version>
         <icon>icon.png</icon>
         <license>MIT</license>
     </meta>
@@ -71,6 +71,16 @@
         <create>media</create>
         <delete>media</delete>
         <update>media</update>
+
+        <read>media_default_folder</read>
+        <create>media_default_folder</create>
+        <delete>media_default_folder</delete>
+        <update>media_default_folder</update>
+
+        <read>media_folder</read>
+        <create>media_folder</create>
+        <delete>media_folder</delete>
+        <update>media_folder</update>
 
         <!-- Tax -->
         <read>tax</read>

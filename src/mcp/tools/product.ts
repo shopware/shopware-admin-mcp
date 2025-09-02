@@ -36,6 +36,20 @@ type ProductCreate = {
 	stock: number;
 	visibilities: ProductVisibility[];
 	categories: { id: string }[];
+	coverId?: string | null;
+	media?: { id: string; mediaId: string; position: number; cover: boolean }[];
+};
+
+type ProductUpdate = {
+	id: string;
+	active?: boolean;
+	name?: string;
+	description?: string;
+	stock?: number;
+	visibilities?: ProductVisibility[];
+	categories?: { id: string }[];
+	coverId?: string | null;
+	media?: { id: string; mediaId: string; position: number; cover: boolean }[];
 };
 
 export const productList = (server: McpServer, shopId: string) => {
@@ -60,6 +74,10 @@ export const productList = (server: McpServer, shopId: string) => {
 			criteria.addFields("id", "productNumber", "name", "stock", "price");
 			criteria.setLimit(50);
 			criteria.setPage(data.page);
+
+			if (data.term) {
+				criteria.setTerm(data.term);
+			}
 
 			const products = await productRepository.search(
 				criteria,
@@ -138,6 +156,19 @@ export const productCreate = (server: McpServer, shopId: string) => {
 				.array(z.string())
 				.optional()
 				.describe("Category ids to which the product belongs"),
+			media: z
+				.array(
+					z.object({
+						mediaId: z.string().describe("ID of the media to link"),
+						position: z.number().optional().describe("Position of the media"),
+						cover: z
+							.boolean()
+							.default(false)
+							.describe("Whether this media is the cover of the product"),
+					}),
+				)
+				.optional()
+				.describe("Array of media items to add to the product"),
 		},
 		async (data) => {
 			const client = await getClient(shopId);
@@ -151,38 +182,47 @@ export const productCreate = (server: McpServer, shopId: string) => {
 
 			const id = uuid();
 
+			const payload: ProductCreate = {
+				id,
+				productNumber: data.productNumber,
+				name: data.name,
+				active: data.active,
+				description: data.description,
+				taxId,
+				stock: data.stock,
+				price: [
+					{
+						currencyId: Defaults.systemCurrencyId,
+						net: data.netPrice,
+						gross: data.grossPrice,
+						linked: false,
+					},
+				],
+				visibilities:
+					data.visibilities?.map((salesChannelId) => ({
+						salesChannelId,
+						visibility: 30, // Default visibility
+					})) || [],
+				categories:
+					data.categories?.map((categoryId) => ({
+						id: categoryId,
+					})) || [],
+			};
+
+			if (data.media) {
+				payload.media = data.media.map((item) => ({
+					id: uuid(),
+					mediaId: item.mediaId,
+					position: item.position ?? 0,
+					cover: item.cover,
+				}));
+
+				const cover = payload.media?.filter((m) => m.cover === true) || [];
+				payload.coverId = cover.length ? cover[0].id : null;
+			}
+
 			try {
-				await productRepository.upsert(
-					[
-						{
-							id,
-							productNumber: data.productNumber,
-							name: data.name,
-							active: data.active,
-							description: data.description,
-							taxId,
-							stock: data.stock,
-							price: [
-								{
-									currencyId: Defaults.systemCurrencyId,
-									net: data.netPrice,
-									gross: data.grossPrice,
-									linked: false,
-								},
-							],
-							visibilities:
-								data.visibilities?.map((salesChannelId) => ({
-									salesChannelId,
-									visibility: 30, // Default visibility
-								})) || [],
-							categories:
-								data.categories?.map((categoryId) => ({
-									id: categoryId,
-								})) || [],
-						},
-					],
-					new ApiContext(null, true),
-				);
+				await productRepository.upsert([payload], new ApiContext(null, true));
 			} catch (e) {
 				return {
 					content: [
@@ -221,6 +261,19 @@ export const productUpdate = (server: McpServer, shopId: string) => {
 				.describe(
 					"Sales channel ids in which the product should be visible (replaces existing visibilities)",
 				),
+			media: z
+				.array(
+					z.object({
+						mediaId: z.string().describe("ID of the media to link"),
+						position: z.number().optional().describe("Position of the media"),
+						cover: z
+							.boolean()
+							.default(false)
+							.describe("Whether this media is the cover of the product"),
+					}),
+				)
+				.optional()
+				.describe("Array of media items to add to the product"),
 			categories: z
 				.array(z.string())
 				.optional()
@@ -247,26 +300,51 @@ export const productUpdate = (server: McpServer, shopId: string) => {
 				);
 			}
 
+			const updatePayload: ProductUpdate = {
+				id: data.id,
+				...(data.active !== undefined && { active: data.active }),
+				...(data.name && { name: data.name }),
+				...(data.description && { description: data.description }),
+				...(data.stock !== undefined && { stock: data.stock }),
+				...(data.visibilities && {
+					visibilities: data.visibilities.map((salesChannelId) => ({
+						salesChannelId: salesChannelId,
+						visibility: 30,
+					})),
+				}),
+				...(data.categories && {
+					categories: data.categories.map((categoryId) => ({
+						id: categoryId,
+					})),
+				}),
+			};
+
+			if (data.media) {
+				ops.push(
+					new SyncOperation(
+						"media-delete",
+						"product_media",
+						"delete",
+						[],
+						[Criteria.equals("productId", data.id)],
+					),
+				);
+
+				updatePayload.media = data.media.map((item) => ({
+					id: uuid(),
+					mediaId: item.mediaId,
+					position: item.position ?? 0,
+					cover: item.cover,
+				}));
+
+				const cover =
+					updatePayload.media?.filter((m) => m.cover === true) || [];
+				updatePayload.coverId = cover.length ? cover[0].id : null;
+			}
+
 			ops.push(
 				new SyncOperation("product-update", "product", "upsert", [
-					{
-						id: data.id,
-						...(data.active !== undefined && { active: data.active }),
-						...(data.name && { name: data.name }),
-						...(data.description && { description: data.description }),
-						...(data.stock !== undefined && { stock: data.stock }),
-						...(data.visibilities && {
-							visibilities: data.visibilities.map((salesChannelId) => ({
-								salesChannelId: salesChannelId,
-								visibility: 30,
-							})),
-						}),
-						...(data.categories && {
-							categories: data.categories.map((categoryId) => ({
-								id: categoryId,
-							})),
-						}),
-					},
+					updatePayload,
 				]),
 			);
 

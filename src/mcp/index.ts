@@ -13,6 +13,7 @@ import {
 	productUpdate,
 } from "./tools/product";
 import { salesChannelList } from "./tools/sales_channel";
+import { uploadMediaByUrl } from "./tools/media";
 
 export class ShopwareAdminMCP extends McpAgent<
 	unknown,
@@ -26,6 +27,8 @@ export class ShopwareAdminMCP extends McpAgent<
 
 	async init() {
 		salesChannelList(this.server, this.props.shopId);
+
+		uploadMediaByUrl(this.server, this.props.shopId);
 
 		// Category tools
 		categoryList(this.server, this.props.shopId);
