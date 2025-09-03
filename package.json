@@ -1,29 +1,25 @@
 {
-	"name": "remote-mcp-server-authless",
-	"version": "0.0.0",
+	"name": "@shopware-ag/admin-mcp",
+	"version": "0.1.0",
 	"license": "MIT",
-	"private": true,
+	"type": "module",
+	"bin": "./dist/index.js",
 	"scripts": {
-		"deploy": "wrangler deploy",
-		"dev": "wrangler dev",
 		"format": "biome format --write",
 		"lint:fix": "biome lint --fix",
-		"start": "wrangler dev",
-		"cf-typegen": "wrangler types",
-		"type-check": "tsc --noEmit"
+		"type-check": "tsc --noEmit",
+		"dev": "tsx --watch src/index.ts",
+		"prepare": "tsc"
 	},
 	"dependencies": {
-		"@cloudflare/workers-oauth-provider": "^0.0.6",
-		"@modelcontextprotocol/sdk": "1.17.1",
+		"@modelcontextprotocol/sdk": "^1.17.5",
 		"@shopware-ag/app-server-sdk": "^1.1.27",
-		"agents": "^0.0.109",
-		"hono": "^4.9.2",
 		"zod": "^3.25.67"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.2.0",
 		"@types/node": "^24.3.0",
-		"typescript": "5.8.3",
-		"wrangler": "^4.31.0"
+		"tsx": "^4.20.5",
+		"typescript": "5.8.3"
 	}
 }

@@ -1,15 +1,14 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { HttpClient } from "@shopware-ag/app-server-sdk";
 import {
 	Defaults,
 	EntityRepository,
 } from "@shopware-ag/app-server-sdk/helper/admin-api";
 import { Criteria } from "@shopware-ag/app-server-sdk/helper/criteria";
-import { getClient, serializeLLM } from "../../shopware";
+import { serializeLLM } from "../shopware.js";
 
-export function salesChannelList(server: McpServer, shopId: string) {
+export function salesChannelList(server: McpServer, client: HttpClient) {
 	server.tool("sales_channel_list", {}, async () => {
-		const client = await getClient(shopId);
-
 		const criteria = new Criteria();
 		criteria.addFields("id", "name", "navigationCategoryId");
 		criteria.addFilter(

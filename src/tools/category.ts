@@ -1,4 +1,5 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { HttpClient } from "@shopware-ag/app-server-sdk";
 import {
 	ApiContext,
 	EntityRepository,
@@ -6,12 +7,10 @@ import {
 } from "@shopware-ag/app-server-sdk/helper/admin-api";
 import { Criteria } from "@shopware-ag/app-server-sdk/helper/criteria";
 import { z } from "zod";
-import { getClient, serializeLLM } from "../../shopware";
+import { serializeLLM } from "../shopware.js";
 
-export function categoryList(server: McpServer, shopId: string) {
+export function categoryList(server: McpServer, client: HttpClient) {
 	server.tool("category_list", {}, async () => {
-		const client = await getClient(shopId);
-
 		const categoryRepository = new EntityRepository<{
 			id: string;
 			active: boolean;
@@ -44,7 +43,7 @@ export function categoryList(server: McpServer, shopId: string) {
 	});
 }
 
-export function categoryCreate(server: McpServer, shopId: string) {
+export function categoryCreate(server: McpServer, client: HttpClient) {
 	server.tool(
 		"category_create",
 		{
@@ -65,8 +64,6 @@ export function categoryCreate(server: McpServer, shopId: string) {
 				.describe("Array of categories to create"),
 		},
 		async (data) => {
-			const client = await getClient(shopId);
-
 			const categoryRepository = new EntityRepository<{
 				id: string;
 				name: string;
@@ -108,7 +105,7 @@ export function categoryCreate(server: McpServer, shopId: string) {
 	);
 }
 
-export function categoryUpdate(server: McpServer, shopId: string) {
+export function categoryUpdate(server: McpServer, client: HttpClient) {
 	server.tool(
 		"category_update",
 		{
@@ -127,8 +124,6 @@ export function categoryUpdate(server: McpServer, shopId: string) {
 				.describe("Array of categories to update"),
 		},
 		async (data) => {
-			const client = await getClient(shopId);
-
 			const categoryRepository = new EntityRepository<{
 				id: string;
 				name?: string;
@@ -168,15 +163,13 @@ export function categoryUpdate(server: McpServer, shopId: string) {
 	);
 }
 
-export function categoryDelete(server: McpServer, shopId: string) {
+export function categoryDelete(server: McpServer, client: HttpClient) {
 	server.tool(
 		"category_delete",
 		{
 			ids: z.array(z.string()).describe("Array of category IDs to delete"),
 		},
 		async (data) => {
-			const client = await getClient(shopId);
-
 			const categoryRepository = new EntityRepository<{
 				id: string;
 			}>(client, "category");

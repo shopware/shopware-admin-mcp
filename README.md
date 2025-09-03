@@ -1,14 +1,14 @@
 # Shopware Admin MCP Server
 
-A Model Context Protocol (MCP) server that provides AI assistants with direct access to Shopware's Admin API for product management tasks. Built on Cloudflare Workers with OAuth authentication.
+A Model Context Protocol (MCP) server that provides AI assistants with direct access to Shopware's Admin API for product management tasks.
 
 ## Features
 
-- **Product Management**: List, search, create, and update products
-- **Secure Authentication**: OAuth-based authentication with token management
+- **Product Management**: List, search, create, and update products with media support
+- **Category Management**: List, create, update, and delete categories (supports bulk operations)
+- **Sales Channel Management**: List sales channels for product visibility
+- **Media Management**: Upload media from URLs for product images
 - **Shopware Integration**: Native integration with Shopware Admin API
-- **Claude Desktop Support**: Direct integration with Claude Desktop and other MCP clients
-- **Serverless Deployment**: Runs on Cloudflare Workers for global scalability
 
 ## Available MCP Tools
 
@@ -16,57 +16,59 @@ A Model Context Protocol (MCP) server that provides AI assistants with direct ac
 |------|-------------|------------|
 | `product_list` | Search and paginate products | `page`, `term` (optional) |
 | `product_get` | Get detailed product information | `id` |
-| `product_create` | Create new products with pricing | `name`, `productNumber`, `description`, `taxRate`, `stock`, `netPrice`, `grossPrice` |
-| `product_update` | Update existing products | `id`, `active`, `name`, `description` |
+| `product_create` | Create new products with pricing and media | `name`, `productNumber`, `description`, `taxRate`, `stock`, `netPrice`, `grossPrice`, `active` (optional), `visibilities` (optional), `categories` (optional), `media` (optional) |
+| `product_update` | Update existing products | `id`, `active` (optional), `name` (optional), `description` (optional), `stock` (optional), `visibilities` (optional), `categories` (optional), `media` (optional) |
+| `category_list` | List all categories | None |
+| `category_create` | Create categories (supports bulk) | `categories` (array with `name`, `parentId` optional, `active` optional) |
+| `category_update` | Update categories (supports bulk) | `categories` (array with `id`, `name` optional, `parentId` optional, `active` optional) |
+| `category_delete` | Delete categories | `ids` (array of category IDs) |
+| `sales_channel_list` | List all sales channels | None |
+| `upload_media_by_url` | Upload media from URL | `url`, `fileName` |
 
 ## Prerequisites
 
 - Shopware 6 instance with admin access
-- Cloudflare account with Workers enabled
-- Node.js 24+ for development
+- Node.js 22+ for development
 
 ## Installation
 
-- Download the latest release from the [releases page](https://github.com/shopware/SwagAdminMCP/releases).
-- Upload the zip to your Shopware Shop (**Shop needs to be externally accessible**)
-- Go to Extensions -> Admin MCP Configuration
-- Configure your desired Chat to use the MCP
+Create a Integration in Shopware Admin with permission to create, read, update, delete products.
 
+Set following environment variables:
+
+- `SHOPWARE_API_URL`: URL of your Shopware instance (e.g., `https://your-shopware-instance.com`)
+- `SHOPWARE_API_CLIENT_ID`: Client ID of the created integration
+- `SHOPWARE_API_CLIENT_SECRET`: Client Secret of the created integration
 
 ## Usage
 
-### With Claude Desktop
+### With mcp.json
 
-Add the following configuration to your Claude Desktop config file:
+Add the following configuration to your mcp.json file:
 
 ```json
 {
   "mcpServers": {
-    "shopware": {
-      "transport": {
-        "type": "http",
-        "url": "https://shopware-admin-mcp.shopware-db5.workers.dev/sse"
+    "shopware-admin-mcp": {
+      "command": "npx",
+      "args": ["-y", "@shopware-ag/admin-mcp"],
+      "env": {
+        "SHOPWARE_API_URL": "https://your-shopware-instance.com",
+        "SHOPWARE_API_CLIENT_ID": "your-integration-client-id",
+        "SHOPWARE_API_CLIENT_SECRET": "your-integration-client-secret"
       }
     }
   }
 }
 ```
 
-### With Other MCP Clients
-
-Use the HTTP transport with:
-- **URL**: `https://shopware-admin-mcp.shopware-db5.workers.dev/sse`
-- **Authentication**: OAuth flow via `/authorize` endpoint
-
 ## Development
 
 ### Local Development
 
 ```bash
-# Start local development server
+# Start local development server in stdio mode
 npm run dev
-
-# The server will be available at http://localhost:8787/sse
 ```
 
 ### Code Quality
@@ -82,64 +84,26 @@ npm run lint:fix
 npm run type-check
 ```
 
-### Testing
-
-The MCP server can be tested locally using:
-
-```bash
-# Start development server
-npm run dev
-
-# In another terminal, test with an MCP client
-# The local server will be at http://localhost:8787/sse
-```
-
-## Architecture
-
-```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   MCP Client    │────│  Cloudflare      │────│   Shopware      │
-│  (Claude, etc.) │    │   Workers        │    │   Admin API     │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
-                              │
-                       ┌──────────────┐
-                       │ Cloudflare   │
-                       │      KV      │
-                       │  (Auth & Shop│
-                       │    Storage)  │
-                       └──────────────┘
-```
-
-### Key Components
-
-- **OAuth Provider**: Handles authentication flow between MCP clients and Shopware
-- **MCP Server**: Implements Model Context Protocol with Shopware-specific tools
-- **App Server**: Manages Shopware app lifecycle (installation, activation, etc.)
-- **Shop Repository**: Manages shop credentials and connection information
-
 ## Permissions
 
-The Shopware app requires the following permissions:
-- Product: read, create, update, delete
-- Product Translation: read, create, update, delete  
-- Sales Channel: read, create, update, delete
-- Tax: read, create, update, delete
-
-## Configuration
-
-### Shopware App Manifest
-
-The app manifest (`SwagAdminMCP/manifest.xml`) defines:
-- Webhook endpoints for app lifecycle events
-- Required permissions for Admin API access
-- Admin panel integration for configuration
-
-### Cloudflare Workers
-
-Configuration in `wrangler.jsonc` includes:
-- KV namespace bindings for data storage
-- Durable Objects for MCP server instances
-- Environment variable bindings
+| Entity                  | Read | Create | Update | Delete |
+|--------------------------|------|--------|--------|--------|
+| **Product**              | ✅   | ✅     | ✅     | ✅     |
+| Product Translation      | ✅   | ✅     | ✅     | ✅     |
+| Product Visibility       | ✅   | ✅     | ✅     | ✅     |
+| Product Category         | ✅   | ✅     | ✅     | ✅     |
+| Product Media            | ✅   | ✅     | ✅     | ✅     |
+| **Category**             | ✅   | ✅     | ✅     | ✅     |
+| Category Translation     | ✅   | ✅     | ✅     | ✅     |
+| **Sales Channel**        | ✅   | ✅     | ✅     | ✅     |
+| **Media**                | ✅   | ✅     | ✅     | ✅     |
+| Media Default Folder     | ✅   | ✅     | ✅     | ✅     |
+| Media Folder             | ✅   | ✅     | ✅     | ✅     |
+| **Tax**                  | ✅   | ✅     | ✅     | ✅     |
+| **Theme**                | ✅   | ✅     | ✅     | ✅     |
+| Theme Translation        | ✅   | ✅     | ✅     | ✅     |
+| Theme Media              | ✅   | ✅     | ✅     | ✅     |
+| Theme Sales Channel      | ✅   | ✅     | ✅     | ✅     |
 
 ## License
 

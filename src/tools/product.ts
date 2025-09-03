@@ -1,4 +1,5 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { HttpClient } from "@shopware-ag/app-server-sdk";
 import {
 	ApiContext,
 	Defaults,
@@ -10,8 +11,8 @@ import {
 } from "@shopware-ag/app-server-sdk/helper/admin-api";
 import { Criteria } from "@shopware-ag/app-server-sdk/helper/criteria";
 import { z } from "zod";
-import { getClient, serializeLLM } from "../../shopware";
-import { getOrCreateTaxByRate } from "./helper";
+import { serializeLLM } from "../shopware.js";
+import { getOrCreateTaxByRate } from "./helper.js";
 
 type Price = {
 	currencyId: string;
@@ -52,7 +53,7 @@ type ProductUpdate = {
 	media?: { id: string; mediaId: string; position: number; cover: boolean }[];
 };
 
-export const productList = (server: McpServer, shopId: string) => {
+export const productList = (server: McpServer, client: HttpClient) => {
 	server.tool(
 		"product_list",
 		{
@@ -60,8 +61,6 @@ export const productList = (server: McpServer, shopId: string) => {
 			term: z.string().optional().describe("Search term"),
 		},
 		async (data) => {
-			const client = await getClient(shopId);
-
 			const productRepository = new EntityRepository<{
 				productNumber: string;
 				name: string;
@@ -96,10 +95,8 @@ export const productList = (server: McpServer, shopId: string) => {
 	);
 };
 
-export const productGet = (server: McpServer, shopId: string) => {
+export const productGet = (server: McpServer, client: HttpClient) => {
 	server.tool("product_get", { id: z.string() }, async ({ id }) => {
-		const client = await getClient(shopId);
-
 		const productRepository = new EntityRepository<{
 			productNumber: string;
 			name: string;
@@ -136,7 +133,7 @@ export const productGet = (server: McpServer, shopId: string) => {
 	});
 };
 
-export const productCreate = (server: McpServer, shopId: string) => {
+export const productCreate = (server: McpServer, client: HttpClient) => {
 	server.tool(
 		"product_create",
 		{
@@ -171,8 +168,6 @@ export const productCreate = (server: McpServer, shopId: string) => {
 				.describe("Array of media items to add to the product"),
 		},
 		async (data) => {
-			const client = await getClient(shopId);
-
 			const productRepository = new EntityRepository<ProductCreate>(
 				client,
 				"product",
@@ -246,7 +241,7 @@ export const productCreate = (server: McpServer, shopId: string) => {
 	);
 };
 
-export const productUpdate = (server: McpServer, shopId: string) => {
+export const productUpdate = (server: McpServer, client: HttpClient) => {
 	server.tool(
 		"product_update",
 		{
@@ -282,8 +277,6 @@ export const productUpdate = (server: McpServer, shopId: string) => {
 				),
 		},
 		async (data) => {
-			const client = await getClient(shopId);
-
 			const syncService = new SyncService(client);
 
 			const ops: SyncOperation[] = [];
