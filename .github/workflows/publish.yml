@@ -1,0 +1,38 @@
+name: Publish
+
+on:
+    release:
+        types: [published]
+
+jobs:
+    publish:
+        runs-on: ubuntu-latest
+
+        permissions:
+            id-token: write
+            contents: read
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  registry-url: "https://registry.npmjs.org"
+
+            - name: Install dependencies
+              run: npm install
+
+            - name: Generate Dist
+              run: npm run prepare
+
+            - name: Set version
+              run: jq '.version = "${{ github.event.release.tag_name }}"' package.json > tmp.json && mv tmp.json package.json
+
+            - name: Publish
+              run: npm publish --provenance
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+                  NPM_CONFIG_PROVENANCE: true
