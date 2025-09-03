@@ -16,10 +16,18 @@ export function categoryList(server: McpServer, client: HttpClient) {
 			active: boolean;
 			translated: { name: string };
 			parentId: string | null;
+			seoUrls: { seoPathInfo: string; salesChannelId: string }[];
 		}>(client, "category");
 
 		const criteria = new Criteria();
-		criteria.addFields("id", "name", "parentId", "active");
+		criteria.addFields(
+			"id",
+			"name",
+			"parentId",
+			"active",
+			"seoUrls.seoPathInfo",
+			"seoUrls.salesChannelId",
+		);
 		criteria.setLimit(50);
 
 		const categories = await categoryRepository.search(
@@ -36,7 +44,7 @@ export function categoryList(server: McpServer, client: HttpClient) {
 			content: [
 				{
 					type: "text",
-					text: serializeLLM(categories),
+					text: `${serializeLLM(categories)}, for complete url call sales_channel_list and prepend the url to the right salesChannelId`,
 				},
 			],
 		};

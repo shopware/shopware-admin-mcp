@@ -9,13 +9,15 @@ import {
 	categoryUpdate,
 } from "./tools/category.js";
 import { uploadMediaByUrl } from "./tools/media.js";
+import { orderDetail, orderList, orderUpdate } from "./tools/order.js";
 import {
 	productCreate,
 	productGet,
 	productList,
 	productUpdate,
 } from "./tools/product.js";
-import { salesChannelList } from "./tools/sales_channel.js";
+import { salesChannelList, salesChannelUpdate } from "./tools/sales_channel.js";
+import { themeConfigChange } from "./tools/theme.js";
 
 const requiredEnvVars = [
 	"SHOPWARE_API_URL",
@@ -49,6 +51,9 @@ shop.setShopCredentials(
 const client = new HttpClient(shop);
 
 salesChannelList(server, client);
+salesChannelUpdate(server, client);
+
+themeConfigChange(server, client);
 
 uploadMediaByUrl(server, client);
 
@@ -63,6 +68,11 @@ productList(server, client);
 productGet(server, client);
 productCreate(server, client);
 productUpdate(server, client);
+
+// Order tools
+orderList(server, client);
+orderDetail(server, client);
+orderUpdate(server, client);
 
 const transport = new StdioServerTransport();
 await server.connect(transport);
