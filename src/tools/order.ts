@@ -46,7 +46,10 @@ export function orderList(server: McpServer, httpClient: HttpClient) {
 		"order_list",
 		{
 			page: z.number().min(1).default(1),
-			term: z.string().optional().describe("Search term to search in order number and customer email"),
+			term: z
+				.string()
+				.optional()
+				.describe("Search term to search in order number and customer email"),
 			filters: z
 				.object({
 					status: z
@@ -239,24 +242,74 @@ export function orderUpdate(server: McpServer, httpClient: HttpClient) {
 				.enum(["cancel", "reopen", "in_progress", "completed"])
 				.describe("The new status of the order")
 				.optional(),
-			billingAddress: z.object({
-				firstName: z.string().describe("The first name of the billing address").optional(),
-				lastName: z.string().describe("The last name of the billing address").optional(),
-				company: z.string().describe("The company name of the billing address").optional(),
-				street: z.string().describe("The street of the billing address").optional(),
-				city: z.string().describe("The city of the billing address").optional(),
-				zipcode: z.string().describe("The zipcode of the billing address").optional(),
-				countryId: z.string().describe("The country ID of the billing address, use country_list to get the id").optional(),
-			}).optional(),
-			shippingAddress: z.object({
-				firstName: z.string().describe("The first name of the shipping address").optional(),
-				lastName: z.string().describe("The last name of the shipping address").optional(),
-				company: z.string().describe("The company name of the shipping address").optional(),
-				street: z.string().describe("The street of the shipping address").optional(),
-				city: z.string().describe("The city of the shipping address").optional(),
-				zipcode: z.string().describe("The zipcode of the shipping address").optional(),
-				countryId: z.string().describe("The country ID of the shipping address, use country_list to get the id").optional(),
-			}).optional(),
+			billingAddress: z
+				.object({
+					firstName: z
+						.string()
+						.describe("The first name of the billing address")
+						.optional(),
+					lastName: z
+						.string()
+						.describe("The last name of the billing address")
+						.optional(),
+					company: z
+						.string()
+						.describe("The company name of the billing address")
+						.optional(),
+					street: z
+						.string()
+						.describe("The street of the billing address")
+						.optional(),
+					city: z
+						.string()
+						.describe("The city of the billing address")
+						.optional(),
+					zipcode: z
+						.string()
+						.describe("The zipcode of the billing address")
+						.optional(),
+					countryId: z
+						.string()
+						.describe(
+							"The country ID of the billing address, use country_list to get the id",
+						)
+						.optional(),
+				})
+				.optional(),
+			shippingAddress: z
+				.object({
+					firstName: z
+						.string()
+						.describe("The first name of the shipping address")
+						.optional(),
+					lastName: z
+						.string()
+						.describe("The last name of the shipping address")
+						.optional(),
+					company: z
+						.string()
+						.describe("The company name of the shipping address")
+						.optional(),
+					street: z
+						.string()
+						.describe("The street of the shipping address")
+						.optional(),
+					city: z
+						.string()
+						.describe("The city of the shipping address")
+						.optional(),
+					zipcode: z
+						.string()
+						.describe("The zipcode of the shipping address")
+						.optional(),
+					countryId: z
+						.string()
+						.describe(
+							"The country ID of the shipping address, use country_list to get the id",
+						)
+						.optional(),
+				})
+				.optional(),
 		},
 		async (data) => {
 			if (data.status) {
@@ -264,7 +317,10 @@ export function orderUpdate(server: McpServer, httpClient: HttpClient) {
 			}
 
 			if (data.billingAddress) {
-				const orderRepo = new EntityRepository<{billingAddressId: string}>(httpClient, "order");
+				const orderRepo = new EntityRepository<{ billingAddressId: string }>(
+					httpClient,
+					"order",
+				);
 				const order = await orderRepo.search(new Criteria([data.id]));
 
 				if (order.total === 0) {
@@ -281,7 +337,9 @@ export function orderUpdate(server: McpServer, httpClient: HttpClient) {
 			}
 
 			if (data.shippingAddress) {
-				const orderRepo = new EntityRepository<{primaryOrderDelivery: {shippingOrderAddressId: string}}>(httpClient, "order");
+				const orderRepo = new EntityRepository<{
+					primaryOrderDelivery: { shippingOrderAddressId: string };
+				}>(httpClient, "order");
 				const order = await orderRepo.search(new Criteria([data.id]));
 
 				if (order.total === 0) {

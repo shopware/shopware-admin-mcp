@@ -150,32 +150,36 @@ export function dalAggregate(server: McpServer, httpClient: HttpClient) {
 }
 
 export function countryList(server: McpServer, httpClient: HttpClient) {
-	server.tool("country_list", {
-		term: z.string().optional().describe("Search term to filter countries"),
-		page: z.number().min(1).default(1).describe("The page to fetch"),
-	}, async (data) => {
-		const countryRepository = new EntityRepository<{ id: string }>(
-			httpClient,
-			"country",
-		);
-		const criteria = new Criteria();
-		criteria.setLimit(20);
-		criteria.addFields("id", "name", "iso");
-		criteria.setPage(data.page);
+	server.tool(
+		"country_list",
+		{
+			term: z.string().optional().describe("Search term to filter countries"),
+			page: z.number().min(1).default(1).describe("The page to fetch"),
+		},
+		async (data) => {
+			const countryRepository = new EntityRepository<{ id: string }>(
+				httpClient,
+				"country",
+			);
+			const criteria = new Criteria();
+			criteria.setLimit(20);
+			criteria.addFields("id", "name", "iso");
+			criteria.setPage(data.page);
 
-		if (data.term) {
-			criteria.setTerm(data.term);
-		}
+			if (data.term) {
+				criteria.setTerm(data.term);
+			}
 
-		const countries = await countryRepository.search(criteria);
+			const countries = await countryRepository.search(criteria);
 
-		return {
-			content: [
-				{
-					type: "text",
-					text: serializeLLM(countries),
-				},
-			],
-		};
-	});
+			return {
+				content: [
+					{
+						type: "text",
+						text: serializeLLM(countries),
+					},
+				],
+			};
+		},
+	);
 }
