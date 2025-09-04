@@ -4,6 +4,10 @@
 	"license": "MIT",
 	"type": "module",
 	"bin": "./dist/index.js",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/shopware/shopware-admin-mcp"
+	},
 	"scripts": {
 		"format": "biome format --write",
 		"lint:fix": "biome lint --fix",
