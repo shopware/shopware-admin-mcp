@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { HttpClient, SimpleShop } from "@shopware-ag/app-server-sdk";
@@ -24,6 +27,13 @@ import {
 import { salesChannelList, salesChannelUpdate } from "./tools/sales_channel.js";
 import { themeConfigChange, themeConfigGet } from "./tools/theme.js";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const packageJson = JSON.parse(
+	readFileSync(join(__dirname, "..", "package.json"), "utf8"),
+);
+const version = packageJson.version;
+
 const requiredEnvVars = [
 	"SHOPWARE_API_URL",
 	"SHOPWARE_API_CLIENT_ID",
@@ -39,7 +49,7 @@ for (const envVar of requiredEnvVars) {
 
 const server = new McpServer({
 	name: "shopware-admin-mcp",
-	version: "0.0.1",
+	version,
 });
 
 const shop = new SimpleShop(
