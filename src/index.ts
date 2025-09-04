@@ -12,6 +12,7 @@ import {
 	categoryUpdate,
 } from "./tools/category.js";
 import {
+	countryList,
 	dalAggregate,
 	fetchEntitySchema,
 	fetchEntitySchemaListEntities,
@@ -68,6 +69,7 @@ const client = new HttpClient(shop);
 fetchEntitySchemaListEntities(server, client);
 fetchEntitySchema(server, client);
 dalAggregate(server, client);
+countryList(server, client);
 
 salesChannelList(server, client);
 salesChannelUpdate(server, client);
