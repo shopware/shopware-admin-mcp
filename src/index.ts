@@ -8,6 +8,11 @@ import {
 	categoryList,
 	categoryUpdate,
 } from "./tools/category.js";
+import {
+	dalAggregate,
+	fetchEntitySchema,
+	fetchEntitySchemaListEntities,
+} from "./tools/general.js";
 import { uploadMediaByUrl } from "./tools/media.js";
 import { orderDetail, orderList, orderUpdate } from "./tools/order.js";
 import {
@@ -49,6 +54,10 @@ shop.setShopCredentials(
 );
 
 const client = new HttpClient(shop);
+
+fetchEntitySchemaListEntities(server, client);
+fetchEntitySchema(server, client);
+dalAggregate(server, client);
 
 salesChannelList(server, client);
 salesChannelUpdate(server, client);
