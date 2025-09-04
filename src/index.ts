@@ -22,7 +22,7 @@ import {
 	productUpdate,
 } from "./tools/product.js";
 import { salesChannelList, salesChannelUpdate } from "./tools/sales_channel.js";
-import { themeConfigChange } from "./tools/theme.js";
+import { themeConfigChange, themeConfigGet } from "./tools/theme.js";
 
 const requiredEnvVars = [
 	"SHOPWARE_API_URL",
@@ -62,6 +62,7 @@ dalAggregate(server, client);
 salesChannelList(server, client);
 salesChannelUpdate(server, client);
 
+themeConfigGet(server, client);
 themeConfigChange(server, client);
 
 uploadMediaByUrl(server, client);
