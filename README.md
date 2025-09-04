@@ -8,6 +8,8 @@ A Model Context Protocol (MCP) server that provides AI assistants with direct ac
 - **Category Management**: List, create, update, and delete categories (supports bulk operations)
 - **Sales Channel Management**: List sales channels for product visibility
 - **Media Management**: Upload media from URLs for product images
+- **Order Management**: List and view orders
+- **Theme Management**: Change theme colors and logos
 - **Shopware Integration**: Native integration with Shopware Admin API
 
 ## Available MCP Tools
@@ -23,7 +25,16 @@ A Model Context Protocol (MCP) server that provides AI assistants with direct ac
 | `category_update` | Update categories (supports bulk) | `categories` (array with `id`, `name` optional, `parentId` optional, `active` optional) |
 | `category_delete` | Delete categories | `ids` (array of category IDs) |
 | `sales_channel_list` | List all sales channels | None |
+| `sales_channel_update` | Update a sales channel | `id`, `active` (optional), `maintenance` (optional) |
 | `upload_media_by_url` | Upload media from URL | `url`, `fileName` |
+| `order_list` | List all orders | `page`, `filters` (optional) |
+| `order_detail` | Get detailed order information | `id` |
+| `order_update` | Update an order | `id`, `status` (optional) |
+| `theme_config_get` | Get the theme configuration for a sales channel | `salesChannelId` |
+| `theme_config_change` | Change the theme configuration for a sales channel | `salesChannelId`, `themeId`, `brandPrimaryColor` (optional), `brandSecondaryColor` (optional), `brandBackgroundColor` (optional), `logoId` (optional) |
+| `fetch_entity_list` | List all available entities in Shopware | None |
+| `fetch_single_entity_schema` | Get the schema for a single entity | `entity` |
+| `dal_aggregate` | Aggregate data from the DAL | `entity`, `type`, `field`, `filter` (optional) |
 
 ## Prerequisites
 
@@ -104,6 +115,10 @@ npm run type-check
 | Theme Translation        | ✅   | ✅     | ✅     | ✅     |
 | Theme Media              | ✅   | ✅     | ✅     | ✅     |
 | Theme Sales Channel      | ✅   | ✅     | ✅     | ✅     |
+| **Order**                | ✅   | ✅     | ✅     | ✅     |
+| Order Customer           | ✅   | ✅     | ✅     | ✅     |
+| Order Delivery           | ✅   | ✅     | ✅     | ✅     |
+| Order Transaction        | ✅   | ✅     | ✅     | ✅     |
 
 ## License
 
