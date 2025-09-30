@@ -30,9 +30,11 @@ jobs:
 
             - name: Set version
               run: jq '.version = "${{ github.event.release.tag_name }}"' package.json > tmp.json && mv tmp.json package.json
+            
+            - name: Update npm
+              run: npm install -g npm@latest
 
             - name: Publish
               run: npm publish --provenance
               env:
-                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
                   NPM_CONFIG_PROVENANCE: true
