@@ -5,28 +5,7 @@ import { fileURLToPath } from "node:url";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { HttpClient, SimpleShop } from "@shopware-ag/app-server-sdk";
-import {
-	categoryCreate,
-	categoryDelete,
-	categoryList,
-	categoryUpdate,
-} from "./tools/category.js";
-import {
-	countryList,
-	dalAggregate,
-	fetchEntitySchema,
-	fetchEntitySchemaListEntities,
-} from "./tools/general.js";
-import { uploadMediaByUrl } from "./tools/media.js";
-import { orderDetail, orderList, orderUpdate } from "./tools/order.js";
-import {
-	productCreate,
-	productGet,
-	productList,
-	productUpdate,
-} from "./tools/product.js";
-import { salesChannelList, salesChannelUpdate } from "./tools/sales_channel.js";
-import { themeConfigChange, themeConfigGet } from "./tools/theme.js";
+import { configureTools } from "./tools/index.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -66,35 +45,7 @@ shop.setShopCredentials(
 
 const client = new HttpClient(shop);
 
-fetchEntitySchemaListEntities(server, client);
-fetchEntitySchema(server, client);
-dalAggregate(server, client);
-countryList(server, client);
-
-salesChannelList(server, client);
-salesChannelUpdate(server, client);
-
-themeConfigGet(server, client);
-themeConfigChange(server, client);
-
-uploadMediaByUrl(server, client);
-
-// Category tools
-categoryList(server, client);
-categoryCreate(server, client);
-categoryUpdate(server, client);
-categoryDelete(server, client);
-
-// Product tools
-productList(server, client);
-productGet(server, client);
-productCreate(server, client);
-productUpdate(server, client);
-
-// Order tools
-orderList(server, client);
-orderDetail(server, client);
-orderUpdate(server, client);
+configureTools(server, client);
 
 const transport = new StdioServerTransport();
 await server.connect(transport);
