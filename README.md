@@ -53,6 +53,20 @@ Set following environment variables:
 
 ## Usage
 
+### With Claude Code CLI
+
+Add the server using the Claude Code CLI:
+
+```bash
+claude mcp add shopware-admin-mcp \
+  --env SHOPWARE_API_URL=https://your-shopware-instance.com \
+  --env SHOPWARE_API_CLIENT_ID=your-integration-client-id \
+  --env SHOPWARE_API_CLIENT_SECRET=your-integration-client-secret \
+  -- npx -y @shopware-ag/admin-mcp
+```
+
+Replace the placeholder values with your actual Shopware instance URL and integration credentials.
+
 ### With mcp.json
 
 Add the following configuration to your mcp.json file:
