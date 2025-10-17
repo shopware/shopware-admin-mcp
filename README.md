@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/shopware-shopware-admin-mcp-badge.png)](https://mseep.ai/app/shopware-shopware-admin-mcp)
+
 # Shopware Admin MCP Server
 
 A Model Context Protocol (MCP) server that provides AI assistants with direct access to Shopware's Admin API for product management tasks.
