@@ -1,5 +1,12 @@
 # Shopware Admin MCP Server
 
+> [!WARNING]
+> **This repository is deprecated, archived, and read-only.**
+>
+> This project is no longer actively maintained. The repository has been archived and is kept available for historical reference only.
+>
+> We are no longer accepting issues, pull requests, feature requests, bug reports, or maintenance updates in this repository. No further releases are planned.
+
 A Model Context Protocol (MCP) server that provides AI assistants with direct access to Shopware's Admin API for product management tasks.
 
 ## Features
